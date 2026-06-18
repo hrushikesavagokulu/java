@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Mastery Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e28;
+    --bg4: #222736;
+    --border: #2a3047;
+    --border2: #3a4260;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --green: #22c55e;
+    --green-dim: #16a34a;
+    --green-bg: #0f2318;
+    --blue: #3b82f6;
+    --blue-dim: #2563eb;
+    --blue-bg: #0f1629;
+    --yellow: #eab308;
+    --yellow-bg: #1a1500;
+    --red: #ef4444;
+    --red-bg: #1a0a0a;
+    --purple: #a855f7;
+    --purple-bg: #160d1f;
+    --cyan: #06b6d4;
+    --orange: #f97316;
+    --accent: #22c55e;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Inter', sans-serif;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    height: 60px;
+    gap: 16px;
+  }
+  .header-logo {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--green);
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+  .header-logo span { color: var(--text2); font-weight: 400; }
+  .header-nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+  }
+  .header-nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { background: var(--bg3); color: var(--text); }
+  .nav-btn.active { background: var(--green-bg); color: var(--green); }
+  .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .icon-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--border2); color: var(--text); }
+
+  /* ── LAYOUT ── */
+  .main { display: flex; min-height: calc(100vh - 60px); }
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .sidebar-section {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 8px 4px;
+  }
+  .sidebar-btn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-btn:hover { background: var(--bg3); color: var(--text); }
+  .sidebar-btn.active { background: var(--green-bg); color: var(--green); }
+  .sidebar-btn .badge {
+    margin-left: auto;
+    background: var(--bg4);
+    border-radius: 10px;
+    font-size: 10px;
+    padding: 1px 6px;
+    color: var(--text3);
+    font-family: var(--font-mono);
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    flex: 1;
+    padding: 28px 32px;
+    overflow-y: auto;
+    min-width: 0;
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── STAT CARDS ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .stat-val {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .stat-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+  .stat-card.green { border-color: var(--green-dim); background: var(--green-bg); }
+  .stat-card.green .stat-val { color: var(--green); }
+  .stat-card.blue { border-color: var(--blue-dim); background: var(--blue-bg); }
+  .stat-card.blue .stat-val { color: var(--blue); }
+  .stat-card.yellow { border-color: #713f12; background: var(--yellow-bg); }
+  .stat-card.yellow .stat-val { color: var(--yellow); }
+  .stat-card.purple { border-color: #7c3aed; background: var(--purple-bg); }
+  .stat-card.purple .stat-val { color: var(--purple); }
+
+  /* ── PROGRESS BAR ── */
+  .prog-bar-wrap { margin-bottom: 28px; }
+  .prog-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+  .prog-bar-label strong { color: var(--text); }
+  .prog-bar {
+    height: 8px;
+    background: var(--bg3);
+    border-radius: 100px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .prog-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-dim), var(--green));
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-hdr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    margin-top: 32px;
+  }
+  .section-hdr:first-child { margin-top: 0; }
+  .section-hdr h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-hdr .tag {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 11px;
+    color: var(--text3);
+    padding: 2px 10px;
+    font-family: var(--font-mono);
+  }
+  .section-hdr .line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── TOPIC GRID ── */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .topic-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .topic-item:hover { border-color: var(--border2); background: var(--bg3); }
+  .topic-item.done { border-color: var(--green-dim); background: var(--green-bg); }
+  .topic-item .checkbox {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border2);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: transparent;
+    transition: all 0.15s;
+  }
+  .topic-item.done .checkbox {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+  }
+  .topic-name {
+    font-size: 12.5px;
+    color: var(--text2);
+    font-family: var(--font-mono);
+    line-height: 1.3;
+    transition: color 0.15s;
+  }
+  .topic-item.done .topic-name { color: var(--green); }
+
+  /* ── DAILY SCHEDULE ── */
+  .day-selector {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .day-btn {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .day-btn:hover { border-color: var(--border2); color: var(--text); }
+  .day-btn.active { background: var(--blue-bg); border-color: var(--blue-dim); color: var(--blue); }
+  .day-btn.completed { background: var(--green-bg); border-color: var(--green-dim); color: var(--green); }
+
+  /* ── TASK CARDS ── */
+  .task-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:900px){ .task-cols { grid-template-columns: 1fr; } }
+  .task-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .task-card-hdr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .task-card-hdr h3 { font-size: 13px; font-weight: 600; }
+  .task-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .task-dot.green { background: var(--green); }
+  .task-dot.blue { background: var(--blue); }
+  .task-dot.yellow { background: var(--yellow); }
+  .task-dot.purple { background: var(--purple); }
+  .task-dot.red { background: var(--red); }
+  .task-dot.cyan { background: var(--cyan); }
+  .task-list { display: flex; flex-direction: column; gap: 6px; }
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+    border: 1px solid transparent;
+  }
+  .task-row:hover { background: var(--bg3); }
+  .task-row.done { background: var(--green-bg); border-color: #1a3a1a; }
+  .task-row .cb {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--border2);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: transparent;
+    transition: all 0.15s;
+  }
+  .task-row.done .cb { background: var(--green); border-color: var(--green); color: #000; }
+  .task-text { font-size: 12.5px; color: var(--text2); line-height: 1.4; }
+  .task-row.done .task-text { color: var(--green); text-decoration: line-through; text-decoration-color: var(--green-dim); }
+
+  /* ── NOTES ── */
+  .notes-area {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 16px;
+    resize: vertical;
+    min-height: 160px;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.15s;
+  }
+  .notes-area:focus { border-color: var(--border2); }
+
+  /* ── TIMER ── */
+  .timer-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .timer-display {
+    font-family: var(--font-mono);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 2px;
+    min-width: 120px;
+  }
+  .timer-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .timer-btns { display: flex; gap: 8px; }
+  .timer-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .timer-btn:hover { border-color: var(--border2); }
+  .timer-btn.primary { background: var(--green-bg); border-color: var(--green-dim); color: var(--green); }
+  .timer-btn.primary:hover { background: var(--green-dim); color: #000; }
+
+  /* ── STREAK ── */
+  .streak-grid {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    padding: 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+  }
+  .streak-day {
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    cursor: pointer;
+    position: relative;
+  }
+  .streak-day.studied { background: var(--green-dim); border-color: var(--green); }
+  .streak-day.today { border-color: var(--yellow); box-shadow: 0 0 6px rgba(234,179,8,0.4); }
+  .streak-day:hover::after {
+    content: attr(data-date);
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 7px;
+    font-size: 10px;
+    white-space: nowrap;
+    z-index: 10;
+  }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .search-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    padding: 11px 16px 11px 42px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--border2); }
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  /* ── PROBLEM TRACKER ── */
+  .prob-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .prob-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .prob-card h4 { font-size: 12px; color: var(--text3); margin-bottom: 6px; }
+  .prob-count {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .prob-card.easy .prob-count { color: var(--green); }
+  .prob-card.medium .prob-count { color: var(--yellow); }
+  .prob-card.hard .prob-count { color: var(--red); }
+  .prob-add {
+    display: flex; gap: 8px; align-items: center; margin-top: 8px;
+  }
+  .prob-add button {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 18px;
+    width: 28px; height: 28px;
+    border-radius: 5px;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.15s;
+  }
+  .prob-add button:hover { background: var(--bg4); }
+
+  /* ── VIVA QUESTIONS ── */
+  .viva-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .viva-q { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+  .viva-a {
+    font-size: 13px;
+    color: var(--text2);
+    background: var(--bg3);
+    border-radius: 6px;
+    padding: 12px;
+    display: none;
+    line-height: 1.6;
+    font-family: var(--font-mono);
+  }
+  .viva-a.show { display: block; }
+  .viva-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    transition: all 0.15s;
+  }
+  .viva-toggle:hover { border-color: var(--border2); color: var(--text2); }
+
+  /* ── EXPORT/IMPORT ── */
+  .action-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .action-btn {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .action-btn:hover { border-color: var(--border2); color: var(--text); }
+  .action-btn.green { border-color: var(--green-dim); color: var(--green); background: var(--green-bg); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
+
+  /* ── TAGS ── */
+  .badge-wrap { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--text3);
+    padding: 2px 8px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width: 768px){
+    .sidebar { display: none; }
+    .content { padding: 16px; }
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .prob-grid { grid-template-columns: 1fr; }
+    .timer-card { flex-direction: column; align-items: flex-start; }
+  }
+  @media(max-width: 480px){
+    .stats-grid { grid-template-columns: 1fr; }
+    .task-cols { grid-template-columns: 1fr; }
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg3);
+    border: 1px solid var(--green-dim);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: var(--green);
+    font-family: var(--font-mono);
+    z-index: 999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:900px){ .two-col { grid-template-columns: 1fr; } }
+
+  .hour-blocks {
+    display: grid;
+    grid-template-columns: repeat(6,1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .hour-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .hour-block:hover { border-color: var(--border2); }
+  .hour-block.done { background: var(--green-bg); border-color: var(--green-dim); }
+  .hour-block .hb-num { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
+  .hour-block.done .hb-num { color: var(--green); }
+  .hour-block .hb-label { font-size: 9px; color: var(--text3); margin-top: 4px; text-transform: uppercase; }
+
+  .mini-prog {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .mini-prog-label { font-size: 11px; color: var(--text3); width: 130px; flex-shrink: 0; }
+  .mini-prog-bar { flex: 1; height: 5px; background: var(--bg3); border-radius: 100px; overflow: hidden; }
+  .mini-prog-fill { height: 100%; background: var(--green-dim); border-radius: 100px; }
+  .mini-prog-pct { font-family: var(--font-mono); font-size: 10px; color: var(--text3); width: 32px; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo">☕ Java<span>.dev()</span></div>
+  <nav class="header-nav">
+    <button class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showPage('today')">Today</button>
+    <button class="nav-btn" onclick="showPage('oop')">OOP</button>
+    <button class="nav-btn" onclick="showPage('java')">Java Topics</button>
+    <button class="nav-btn" onclick="showPage('input')">Input Patterns</button>
+    <button class="nav-btn" onclick="showPage('cp')">CP Patterns</button>
+    <button class="nav-btn" onclick="showPage('problems')">Problems</button>
+    <button class="nav-btn" onclick="showPage('viva')">Viva Prep</button>
+    <button class="nav-btn" onclick="showPage('streak')">Streak</button>
+    <button class="nav-btn" onclick="showPage('notes')">Notes</button>
+  </nav>
+  <div class="header-actions">
+    <button class="icon-btn" onclick="exportData()" title="Export">⬇</button>
+    <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="Import">⬆</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="icon-btn" onclick="resetAll()" title="Reset">↺</button>
+  </div>
+</header>
+
+<div class="main">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">Overview</div>
+  <button class="sidebar-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
+  <button class="sidebar-btn" onclick="showPage('today')">📅 Today's Plan</button>
+  <button class="sidebar-btn" onclick="showPage('streak')">🔥 Streak</button>
+  <button class="sidebar-btn" onclick="showPage('notes')">📝 Notes</button>
+
+  <div class="sidebar-section">Topics</div>
+  <button class="sidebar-btn" onclick="showPage('oop')">🔷 OOP <span class="badge" id="oop-badge">0/48</span></button>
+  <button class="sidebar-btn" onclick="showPage('java')">☕ Java Topics <span class="badge" id="java-badge">0/67</span></button>
+  <button class="sidebar-btn" onclick="showPage('input')">📥 Input Patterns <span class="badge" id="input-badge">0/55</span></button>
+  <button class="sidebar-btn" onclick="showPage('cp')">⚡ CP Patterns <span class="badge" id="cp-badge">0/35</span></button>
+
+  <div class="sidebar-section">Problems</div>
+  <button class="sidebar-btn" onclick="showPage('problems')">🧩 Problem Sets</button>
+  <button class="sidebar-btn" onclick="showPage('viva')">🎤 Viva Prep</button>
+</aside>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- ═══ DASHBOARD PAGE ═══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="section-hdr" style="margin-top:0">
+      <h2>Dashboard</h2>
+      <div class="tag" id="today-date"></div>
+      <div class="line"></div>
+      <span style="font-size:12px;color:var(--text3)" id="greeting"></span>
+    </div>
+
+    <!-- stats -->
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-label">Overall Progress</div>
+        <div class="stat-val" id="stat-overall">0%</div>
+        <div class="stat-sub" id="stat-overall-sub">of all topics</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Current Day</div>
+        <div class="stat-val" id="stat-day">1</div>
+        <div class="stat-sub">of 20-day plan</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-label">🔥 Streak</div>
+        <div class="stat-val" id="stat-streak">0</div>
+        <div class="stat-sub">days in a row</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Problems Solved</div>
+        <div class="stat-val" id="stat-problems">0</div>
+        <div class="stat-sub" id="stat-problems-sub">E:0 M:0 H:0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Study Hours</div>
+        <div class="stat-val" id="stat-hours">0h</div>
+        <div class="stat-sub">total logged</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Topics Done</div>
+        <div class="stat-val" id="stat-topics">0</div>
+        <div class="stat-sub" id="stat-topics-sub">of 205 total</div>
+      </div>
+    </div>
+
+    <!-- overall progress bar -->
+    <div class="prog-bar-wrap">
+      <div class="prog-bar-label"><strong>Overall Completion</strong><span id="prog-overall-pct">0%</span></div>
+      <div class="prog-bar"><div class="prog-bar-fill" id="prog-overall-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- per-section progress -->
+    <div class="section-hdr"><h2>Section Progress</h2><div class="line"></div></div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px">
+      <div class="mini-prog"><div class="mini-prog-label">🔷 OOP Concepts</div><div class="mini-prog-bar"><div class="mini-prog-fill" id="mp-oop" style="width:0%"></div></div><div class="mini-prog-pct" id="mp-oop-pct">0%</div></div>
+      <div class="mini-prog"><div class="mini-prog-label">☕ Java Topics</div><div class="mini-prog-bar"><div class="mini-prog-fill" id="mp-java" style="width:0%"></div></div><div class="mini-prog-pct" id="mp-java-pct">0%</div></div>
+      <div class="mini-prog"><div class="mini-prog-label">📥 Input Patterns</div><div class="mini-prog-bar"><div class="mini-prog-fill" id="mp-input" style="width:0%"></div></div><div class="mini-prog-pct" id="mp-input-pct">0%</div></div>
+      <div class="mini-prog"><div class="mini-prog-label">⚡ CP Patterns</div><div class="mini-prog-bar"><div class="mini-prog-fill" id="mp-cp" style="width:0%"></div></div><div class="mini-prog-pct" id="mp-cp-pct">0%</div></div>
+    </div>
+
+    <!-- today's summary -->
+    <div class="section-hdr"><h2>Today's Schedule (6 Hours)</h2><div class="line"></div></div>
+    <div class="hour-blocks">
+      <div class="hour-block" id="hb-1" onclick="toggleHour(1)">
+        <div class="hb-num">H1</div>
+        <div class="hb-label">OOP Theory</div>
+      </div>
+      <div class="hour-block" id="hb-2" onclick="toggleHour(2)">
+        <div class="hb-num">H2</div>
+        <div class="hb-label">Java Topics</div>
+      </div>
+      <div class="hour-block" id="hb-3" onclick="toggleHour(3)">
+        <div class="hb-num">H3</div>
+        <div class="hb-label">Input + Coding</div>
+      </div>
+      <div class="hour-block" id="hb-4" onclick="toggleHour(4)">
+        <div class="hb-num">H4</div>
+        <div class="hb-label">DSA / LeetCode</div>
+      </div>
+      <div class="hour-block" id="hb-5" onclick="toggleHour(5)">
+        <div class="hb-num">H5</div>
+        <div class="hb-label">CP Problems</div>
+      </div>
+      <div class="hour-block" id="hb-6" onclick="toggleHour(6)">
+        <div class="hb-num">H6</div>
+        <div class="hb-label">Revision</div>
+      </div>
+    </div>
+
+    <!-- quick notes -->
+    <div class="section-hdr"><h2>Quick Note</h2><div class="line"></div></div>
+    <textarea class="notes-area" id="quick-note" placeholder="Type a quick note for today..." oninput="saveQuickNote()" rows="4"></textarea>
+  </div>
+
+  <!-- ═══ TODAY PAGE ═══ -->
+  <div class="page" id="page-today">
+    <div class="section-hdr" style="margin-top:0"><h2>Today's Full Plan</h2><div class="line"></div></div>
+
+    <!-- study timer -->
+    <div class="timer-card">
+      <div>
+        <div class="timer-display" id="timer-display">06:00:00</div>
+        <div class="timer-label">Countdown Timer (6 Hours)</div>
+      </div>
+      <div class="timer-btns">
+        <button class="timer-btn primary" id="timer-start-btn" onclick="timerToggle()">▶ Start</button>
+        <button class="timer-btn" onclick="timerReset()">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- day selector -->
+    <div class="section-hdr"><h2>Select Day</h2><div class="line"></div></div>
+    <div class="day-selector" id="day-selector"></div>
+
+    <!-- daily tasks -->
+    <div class="task-cols" id="daily-tasks-col">
+      <!-- OOP Block -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot green"></div>
+          <h3>🔷 OOP Block (Hour 1)</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Study 1 OOP concept deeply</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Answer 10 Viva questions (write answers)</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Solve 5 Output-tracing questions</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Solve 3 Debugging questions</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Write 1 Mini Program using today's concept</div></div>
+        </div>
+      </div>
+
+      <!-- Java Topics Block -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot blue"></div>
+          <h3>☕ Java Topics (Hour 2)</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Study 1 Java API / language topic</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Write syntax + notes in notebook</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Practice 3–5 code snippets for topic</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Compare topic to related topic (e.g. ArrayList vs LinkedList)</div></div>
+        </div>
+      </div>
+
+      <!-- Input Patterns Block -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot cyan"></div>
+          <h3>📥 Input Patterns (Hour 3 - Part A)</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Learn 2 new input patterns (Scanner / BufferedReader)</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Write each input pattern from memory</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Practice with real data (arrays, maps, graphs)</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Mark patterns as completed in Input tab</div></div>
+        </div>
+      </div>
+
+      <!-- Coding Patterns Block -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot yellow"></div>
+          <h3>⚡ Coding Patterns (Hour 3 - Part B)</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Study 1 CP pattern (Sliding Window / Two Pointer etc)</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Implement the pattern in Java from scratch</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Apply pattern to 2 problems</div></div>
+        </div>
+      </div>
+
+      <!-- DSA / LeetCode Block -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot purple"></div>
+          <h3>🧩 DSA + LeetCode (Hour 4)</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Solve 5 Easy LeetCode / HackerRank problems</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Solve 3 Medium problems (timed: 20 min each)</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Analyze your solutions - time + space complexity</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Review editorial for Medium if needed</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Log problems solved in Problems tab</div></div>
+        </div>
+      </div>
+
+      <!-- Competitive Programming Block -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot red"></div>
+          <h3>🏆 Competitive Programming (Hour 5)</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Solve 1 Hard / Challenge problem (30 min)</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Practice contest-style: no hints for 20 min first</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Write Competitive Programming template from memory</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Solve past contest question (Codeforces/CodeChef)</div></div>
+        </div>
+      </div>
+
+      <!-- Revision Block -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot green"></div>
+          <h3>🔄 Revision (Hour 6)</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Revise all OOP topics from previous days</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Revise all Java topics from previous days</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Re-solve 3 problems without looking at solution</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Write today's key learnings in Notes tab</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Update dashboard — check off all completed topics</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Mark today as studied in Streak tab</div></div>
+        </div>
+      </div>
+
+      <!-- Bonus -->
+      <div class="task-card">
+        <div class="task-card-hdr">
+          <div class="task-dot yellow"></div>
+          <h3>⭐ Bonus / Extra Tasks</h3>
+        </div>
+        <div class="task-list">
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Attempt 1 more Hard problem</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Read Java documentation for today's topic</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Watch 1 video on topic (GeeksforGeeks / NeetCode)</div></div>
+          <div class="task-row" onclick="toggleTask(this)"><div class="cb">✓</div><div class="task-text">Share learning with peer / write blog note</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ OOP PAGE ═══ -->
+  <div class="page" id="page-oop">
+    <div class="section-hdr" style="margin-top:0"><h2>OOP Concepts</h2><div class="tag">48 Topics</div><div class="line"></div></div>
+    <div class="prog-bar-wrap">
+      <div class="prog-bar-label"><strong>OOP Progress</strong><span id="prog-oop-pct">0/48</span></div>
+      <div class="prog-bar"><div class="prog-bar-fill" id="prog-oop-fill" style="width:0%"></div></div>
+    </div>
+    <div class="topic-grid" id="oop-grid"></div>
+  </div>
+
+  <!-- ═══ JAVA TOPICS PAGE ═══ -->
+  <div class="page" id="page-java">
+    <div class="section-hdr" style="margin-top:0"><h2>Java Coding Topics</h2><div class="tag">67 Topics</div><div class="line"></div></div>
+    <div class="prog-bar-wrap">
+      <div class="prog-bar-label"><strong>Java Topics Progress</strong><span id="prog-java-pct">0/67</span></div>
+      <div class="prog-bar"><div class="prog-bar-fill" id="prog-java-fill" style="width:0%"></div></div>
+    </div>
+    <div class="topic-grid" id="java-grid"></div>
+  </div>
+
+  <!-- ═══ INPUT PATTERNS PAGE ═══ -->
+  <div class="page" id="page-input">
+    <div class="section-hdr" style="margin-top:0"><h2>Input Patterns</h2><div class="tag">55 Patterns</div><div class="line"></div></div>
+    <div class="prog-bar-wrap">
+      <div class="prog-bar-label"><strong>Input Patterns Progress</strong><span id="prog-input-pct">0/55</span></div>
+      <div class="prog-bar"><div class="prog-bar-fill" id="prog-input-fill" style="width:0%"></div></div>
+    </div>
+    <div class="topic-grid" id="input-grid"></div>
+  </div>
+
+  <!-- ═══ CP PATTERNS PAGE ═══ -->
+  <div class="page" id="page-cp">
+    <div class="section-hdr" style="margin-top:0"><h2>Competitive Programming Patterns</h2><div class="tag">35 Patterns</div><div class="line"></div></div>
+    <div class="prog-bar-wrap">
+      <div class="prog-bar-label"><strong>CP Patterns Progress</strong><span id="prog-cp-pct">0/35</span></div>
+      <div class="prog-bar"><div class="prog-bar-fill" id="prog-cp-fill" style="width:0%"></div></div>
+    </div>
+    <div class="topic-grid" id="cp-grid"></div>
+
+    <div class="section-hdr"><h2>String Problems</h2><div class="tag">22</div><div class="line"></div></div>
+    <div class="topic-grid" id="string-grid"></div>
+
+    <div class="section-hdr"><h2>Array Problems</h2><div class="tag">23</div><div class="line"></div></div>
+    <div class="topic-grid" id="array-grid"></div>
+
+    <div class="section-hdr"><h2>Recursion Problems</h2><div class="tag">13</div><div class="line"></div></div>
+    <div class="topic-grid" id="recursion-grid"></div>
+
+    <div class="section-hdr"><h2>Stack & Queue Problems</h2><div class="tag">13</div><div class="line"></div></div>
+    <div class="topic-grid" id="stackqueue-grid"></div>
+
+    <div class="section-hdr"><h2>Tree Problems</h2><div class="tag">14</div><div class="line"></div></div>
+    <div class="topic-grid" id="tree-grid"></div>
+
+    <div class="section-hdr"><h2>Graph Problems</h2><div class="tag">10</div><div class="line"></div></div>
+    <div class="topic-grid" id="graph-grid"></div>
+  </div>
+
+  <!-- ═══ PROBLEMS PAGE ═══ -->
+  <div class="page" id="page-problems">
+    <div class="section-hdr" style="margin-top:0"><h2>Problem Tracker</h2><div class="line"></div></div>
+    <div class="prob-grid">
+      <div class="prob-card easy">
+        <h4>EASY</h4>
+        <div class="prob-count" id="easy-count">0</div>
+        <div class="prob-add">
+          <button onclick="addProb('easy',-1)">−</button>
+          <button onclick="addProb('easy',1)">+</button>
+        </div>
+      </div>
+      <div class="prob-card medium">
+        <h4>MEDIUM</h4>
+        <div class="prob-count" id="medium-count">0</div>
+        <div class="prob-add">
+          <button onclick="addProb('medium',-1)">−</button>
+          <button onclick="addProb('medium',1)">+</button>
+        </div>
+      </div>
+      <div class="prob-card hard">
+        <h4>HARD</h4>
+        <div class="prob-count" id="hard-count">0</div>
+        <div class="prob-add">
+          <button onclick="addProb('hard',-1)">−</button>
+          <button onclick="addProb('hard',1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-hdr"><h2>Problem Categories Checklist</h2><div class="line"></div></div>
+    <div class="task-cols">
+      <div class="task-card">
+        <div class="task-card-hdr"><div class="task-dot green"></div><h3>Strings</h3></div>
+        <div class="task-list" id="prob-strings"></div>
+      </div>
+      <div class="task-card">
+        <div class="task-card-hdr"><div class="task-dot blue"></div><h3>Arrays</h3></div>
+        <div class="task-list" id="prob-arrays"></div>
+      </div>
+      <div class="task-card">
+        <div class="task-card-hdr"><div class="task-dot yellow"></div><h3>Recursion</h3></div>
+        <div class="task-list" id="prob-recursion"></div>
+      </div>
+      <div class="task-card">
+        <div class="task-card-hdr"><div class="task-dot purple"></div><h3>Stack & Queue</h3></div>
+        <div class="task-list" id="prob-stackqueue"></div>
+      </div>
+      <div class="task-card">
+        <div class="task-card-hdr"><div class="task-dot cyan"></div><h3>Trees</h3></div>
+        <div class="task-list" id="prob-trees"></div>
+      </div>
+      <div class="task-card">
+        <div class="task-card-hdr"><div class="task-dot red"></div><h3>Graphs</h3></div>
+        <div class="task-list" id="prob-graphs"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ VIVA PAGE ═══ -->
+  <div class="page" id="page-viva">
+    <div class="section-hdr" style="margin-top:0"><h2>Viva Preparation</h2><div class="tag">OOP Interview Questions</div><div class="line"></div></div>
+    <div id="viva-list"></div>
+  </div>
+
+  <!-- ═══ STREAK PAGE ═══ -->
+  <div class="page" id="page-streak">
+    <div class="section-hdr" style="margin-top:0"><h2>Study Streak</h2><div class="line"></div></div>
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-label">Current Streak</div>
+        <div class="stat-val" id="streak-current">0</div>
+        <div class="stat-sub">days</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-label">Longest Streak</div>
+        <div class="stat-val" id="streak-longest">0</div>
+        <div class="stat-sub">days</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Total Days</div>
+        <div class="stat-val" id="streak-total">0</div>
+        <div class="stat-sub">studied</div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="action-btn green" onclick="markToday()">✅ Mark Today as Studied</button>
+    </div>
+
+    <div class="section-hdr"><h2>Last 60 Days</h2><div class="line"></div></div>
+    <div class="streak-grid" id="streak-grid"></div>
+
+    <div class="section-hdr"><h2>Study Hours Log</h2><div class="line"></div></div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">
+      <input type="number" id="hours-input" placeholder="Hours today" min="0" max="24" step="0.5"
+        style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);padding:9px 14px;width:140px;outline:none">
+      <button class="action-btn" onclick="logHours()">+ Log Hours</button>
+    </div>
+    <div style="font-family:var(--font-mono);font-size:13px;color:var(--text2)">
+      Total: <span id="total-hours-display" style="color:var(--green)">0h</span>
+    </div>
+  </div>
+
+  <!-- ═══ NOTES PAGE ═══ -->
+  <div class="page" id="page-notes">
+    <div class="section-hdr" style="margin-top:0"><h2>Study Notes</h2><div class="line"></div></div>
+
+    <div class="action-row">
+      <button class="action-btn" onclick="addNoteSection()">+ Add Note</button>
+      <button class="action-btn green" onclick="exportData()">⬇ Export All Data</button>
+      <button class="action-btn" onclick="document.getElementById('importFile').click()">⬆ Import Data</button>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">Day Notes (quick entry)</label>
+      <textarea class="notes-area" id="main-notes" placeholder="Write your learning notes here... Use // for comments, like code!" oninput="saveNotes()" style="min-height:300px"></textarea>
+    </div>
+
+    <div class="section-hdr"><h2>Bookmarks</h2><div class="line"></div></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="bookmark-input" placeholder="Add bookmark (e.g. LeetCode #200)"
+        style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);padding:9px 14px;outline:none">
+      <button class="action-btn" onclick="addBookmark()">+ Add</button>
+    </div>
+    <div id="bookmark-list"></div>
+  </div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+
+const OOP_TOPICS = [
+  "Introduction to OOP","Class","Object","Method","Constructor","this keyword",
+  "static","final","Encapsulation","Inheritance","Single Inheritance",
+  "Multilevel Inheritance","Hierarchical Inheritance","Method Overloading",
+  "Method Overriding","Polymorphism","Runtime Polymorphism",
+  "Compile Time Polymorphism","Abstraction","Abstract Class","Interface",
+  "Multiple Inheritance via Interface","Association","Aggregation","Composition",
+  "Inner Class","Anonymous Class","Enum","Record","Packages","Access Modifiers",
+  "Object Class","equals()","hashCode()","toString()","clone()","Comparable",
+  "Comparator","Exception Handling","Custom Exception","Generics","Wrapper Classes",
+  "Annotations","Reflection Basics","Serialization","File Handling","Streams",
+  "Lambda Expressions"
+];
+
+const JAVA_TOPICS = [
+  "Variables","Data Types","Operators","Scanner","BufferedReader","Input Parsing",
+  "Output Formatting","Type Casting","if","switch","for","while","do while",
+  "break","continue","Functions","Recursion","Math","Arrays","2D Arrays","Strings",
+  "char[]","StringBuilder","StringBuffer","ArrayList","LinkedList","Vector","Stack",
+  "Queue","Deque","Priority Queue","HashSet","LinkedHashSet","TreeSet","HashMap",
+  "LinkedHashMap","TreeMap","Iterator","Collections Utility","Arrays Utility",
+  "Binary Search","Sorting","Searching","Prefix Sum","Sliding Window","Two Pointers",
+  "Greedy Basics","Bit Manipulation","Backtracking","Trees","BST","Heap",
+  "Graph Basics","DFS","BFS","Union Find Basic","Trie Basic","Dynamic Programming Basic",
+  "Functional Interface","Method Reference","Collections Framework Overview",
+  "Fast Input Pattern","Competitive Programming Template","Lambda Expressions"
+];
+
+const INPUT_PATTERNS = [
+  "Single Integer","Single Long","Single Double","Single Float","Single Character",
+  "Single Boolean","Single String","Multiple Integers Same Line","Multiple Long Same Line",
+  "Multiple Strings Same Line","Character Input","Whole Line Input","Mixed Input",
+  "Test Cases","1D int Array","1D long Array","1D String Array","1D char Array",
+  "2D int Matrix","2D char Matrix","2D String Matrix","Jagged Array",
+  "ArrayList<Integer>","ArrayList<Long>","ArrayList<String>","LinkedList<Integer>",
+  "Stack<Integer>","Queue<Integer>","Deque<Integer>","PriorityQueue Min Heap",
+  "PriorityQueue Max Heap","HashSet<Integer>","HashSet<String>",
+  "HashMap<Integer,Integer>","HashMap<Character,Integer>","HashMap<String,Integer>",
+  "TreeMap","TreeSet","Graph Adjacency List","Graph Edge List","Weighted Graph",
+  "Adjacency Matrix","Binary Tree","BST","Linked List","Pairs","Triplets",
+  "Intervals","Queries","Range Queries","Grid Input","Coordinate Input",
+  "Custom Objects","Comparable Input","Fast Input Pattern"
+];
+
+const CP_PATTERNS = [
+  "Frequency Count","Prefix Sum","Suffix Sum","Difference Array","Sliding Window",
+  "Two Pointer","Binary Search","Greedy","Sorting","Hashing","Stack Pattern",
+  "Monotonic Stack","Queue Pattern","Deque Pattern","Heap Pattern","Recursion",
+  "Backtracking","DFS","BFS","Tree Traversal","Union Find","Topological Sort",
+  "Shortest Path","Matrix Traversal","Simulation","Intervals","Sweep Line",
+  "Bit Manipulation","Math","Number Theory","Prime","GCD/LCM","Fast Power",
+  "Combinatorics","DP Basics"
+];
+
+const STRING_PROBLEMS = [
+  "Palindrome","Reverse String","Reverse Words","Anagram","Character Frequency",
+  "Duplicate Characters","Remove Duplicates","Longest Word","Substring","Subsequence",
+  "Compression","Rotation","Toggle Case","Camel Case","String Builder Practice",
+  "Pattern Matching","ASCII Tricks","Vowels & Consonants","Lexicographical Order",
+  "Longest Common Prefix","Valid Parentheses","Caesar Cipher"
+];
+
+const ARRAY_PROBLEMS = [
+  "Maximum","Minimum","Second Largest","Second Smallest","Reverse","Rotation",
+  "Move Zeroes","Remove Duplicates","Frequency Count","Missing Number",
+  "Duplicate Number","Majority Element","Kadane's Algorithm","Prefix Sum",
+  "Merge Arrays","Intersection","Union","Leaders in Array","Spiral Matrix",
+  "Transpose","Rotate Matrix","Binary Search","Lower/Upper Bound"
+];
+
+const RECURSION_PROBLEMS = [
+  "Factorial","Power","Fibonacci","Palindrome Check","Reverse Array",
+  "Reverse String","Subset Generation","Permutations","Combinations",
+  "N Queens","Sudoku Solver","Maze Problem","Tower of Hanoi"
+];
+
+const STACKQUEUE_PROBLEMS = [
+  "Balanced Parentheses","Next Greater Element","Previous Greater",
+  "Stock Span","Largest Rectangle Histogram","Infix Conversion",
+  "Postfix Evaluation","Prefix Conversion","LRU Cache",
+  "Sliding Window Maximum","Circular Queue","Queue Using Stack","Stack Using Queue"
+];
+
+const TREE_PROBLEMS = [
+  "Inorder/Preorder/Postorder","Height of Tree","Diameter","Balanced Tree",
+  "Mirror Tree","LCA","Level Order Traversal","Boundary Traversal",
+  "Vertical Order","Top View","Bottom View","BST Search","BST Insert","BST Delete"
+];
+
+const GRAPH_PROBLEMS = [
+  "DFS Traversal","BFS Traversal","Connected Components","Cycle Detection",
+  "Shortest Path","Topological Sort","Bipartite Check","Flood Fill",
+  "Island Problems","Graph Traversal"
+];
+
+const VIVA_QA = [
+  { q:"What is OOP? What are its four pillars?", a:"OOP (Object-Oriented Programming) is a paradigm based on objects. The four pillars are: Encapsulation (hiding data), Inheritance (reusing code), Polymorphism (many forms), Abstraction (hiding complexity)." },
+  { q:"What is the difference between a Class and an Object?", a:"A Class is a blueprint/template. An Object is an instance of a class. Class defines structure; Object holds actual data in memory." },
+  { q:"What is a Constructor? Types of constructors in Java?", a:"A Constructor initializes an object. Types: Default Constructor (no-arg), Parameterized Constructor, Copy Constructor. Name must match class name, no return type." },
+  { q:"What is the difference between Method Overloading and Overriding?", a:"Overloading: same method name, different parameters — happens at compile time. Overriding: subclass redefines parent method — happens at runtime. Overriding enables runtime polymorphism." },
+  { q:"What is the 'this' keyword in Java?", a:"'this' refers to the current object instance. Used to differentiate instance vars from local vars, call another constructor (this()), or pass current object as argument." },
+  { q:"What is the difference between Abstract Class and Interface?", a:"Abstract class: can have state, constructors, partial implementation, single inheritance. Interface: no state (only constants), no constructors, all methods abstract (pre-Java 8), multiple inheritance allowed." },
+  { q:"What is Encapsulation? How do you achieve it?", a:"Encapsulation = binding data + methods, hiding internal state. Achieved via: private fields, public getters/setters. Benefits: data hiding, controlled access, maintainability." },
+  { q:"What is Polymorphism? Give examples.", a:"Polymorphism = one interface, many implementations. Compile-time: method overloading. Runtime: method overriding. Example: Animal a = new Dog(); a.speak(); calls Dog's speak()." },
+  { q:"What is the difference between static and non-static methods?", a:"Static: belongs to class, called via ClassName.method(), cannot access instance vars. Non-static: belongs to object, called via object.method(), can access all instance vars." },
+  { q:"What is final in Java? Where can it be used?", a:"final variable = constant (cannot reassign). final method = cannot be overridden. final class = cannot be subclassed. Used for immutability and security." },
+  { q:"What are Access Modifiers in Java?", a:"private: same class only. default: same package. protected: same package + subclasses. public: everywhere. They control visibility and encapsulation." },
+  { q:"What is the difference between Aggregation, Association and Composition?", a:"Association: has-a relationship (loose). Aggregation: child can exist without parent (HAS-A, weak). Composition: child cannot exist without parent (PART-OF, strong). Example: Car-Engine (composition)." },
+  { q:"What is an Inner Class?", a:"A class defined inside another class. Types: Static Nested Class, Non-static Inner Class, Local Class (inside method), Anonymous Class. Used for logical grouping and encapsulation." },
+  { q:"What is the difference between == and equals() in Java?", a:"== compares reference (memory address). equals() compares content/value. For Strings: s1==s2 checks if same object; s1.equals(s2) checks if same text." },
+  { q:"What is Exception Handling? Keywords used?", a:"Mechanism to handle runtime errors gracefully. Keywords: try (risky code), catch (handle exception), finally (always runs), throw (raise exception), throws (declare exception in signature)." },
+  { q:"What is Generics in Java?", a:"Generics allow type-safe collections and methods. E.g., ArrayList<String> ensures only Strings. Reduces ClassCastException. Uses type parameters like <T>, <E>, <K,V>." },
+  { q:"What is the Comparable vs Comparator interface?", a:"Comparable: natural ordering, implemented by the class itself (compareTo). Comparator: custom ordering, separate class or lambda (compare). Use Comparator for multiple sort orders." },
+  { q:"What is a Functional Interface?", a:"An interface with exactly ONE abstract method. Used with Lambda expressions. Examples: Runnable, Callable, Comparator, Predicate, Function, Consumer, Supplier." },
+  { q:"What is a Lambda Expression?", a:"A concise way to implement a functional interface. Syntax: (params) -> expression. E.g., list.sort((a,b) -> a-b). Replaces anonymous class implementations." },
+  { q:"What is Serialization in Java?", a:"Converting an object to a byte stream for storage/transmission. Class must implement Serializable. Use ObjectOutputStream to serialize, ObjectInputStream to deserialize. transient fields are skipped." },
+];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+
+let state = {
+  oop: {}, java: {}, input: {}, cp: {},
+  strings: {}, arrays: {}, recursion: {}, stackqueue: {}, trees: {}, graphs: {},
+  probStrings: {}, probArrays: {}, probRecursion: {}, probStackQueue: {},
+  probTrees: {}, probGraphs: {},
+  easy: 0, medium: 0, hard: 0,
+  streak: [], longestStreak: 0, hours: 0,
+  notes: '', quickNote: '', bookmarks: [],
+  hoursCompleted: {}, dayTasks: {},
+  currentDay: 1,
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('java_dash_v2');
+    if (s) state = Object.assign({
+      oop:{},java:{},input:{},cp:{},
+      strings:{},arrays:{},recursion:{},stackqueue:{},trees:{},graphs:{},
+      probStrings:{},probArrays:{},probRecursion:{},probStackQueue:{},
+      probTrees:{},probGraphs:{},
+      easy:0,medium:0,hard:0,streak:[],longestStreak:0,hours:0,
+      notes:'',quickNote:'',bookmarks:[],hoursCompleted:{},dayTasks:{},currentDay:1,
+    }, JSON.parse(s));
+  } catch(e){}
+}
+
+function saveState() {
+  localStorage.setItem('java_dash_v2', JSON.stringify(state));
+}
+
+// ═══════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn,.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll(`[onclick*="'${id}'"]`).forEach(b => b.classList.add('active'));
+}
+
+// ═══════════════════════════════════════════════
+// TOPIC GRIDS
+// ═══════════════════════════════════════════════
+
+function makeGrid(containerId, topics, stateKey) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  topics.forEach((t, i) => {
+    const done = state[stateKey][i];
+    const div = document.createElement('div');
+    div.className = 'topic-item' + (done ? ' done' : '');
+    div.innerHTML = `<div class="checkbox">✓</div><div class="topic-name">${t}</div>`;
+    div.onclick = () => {
+      state[stateKey][i] = !state[stateKey][i];
+      div.classList.toggle('done');
+      saveState();
+      updateStats();
+    };
+    el.appendChild(div);
+  });
+}
+
+function makeProbList(containerId, problems, stateKey) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  problems.forEach((t, i) => {
+    const done = state[stateKey][i];
+    const div = document.createElement('div');
+    div.className = 'task-row' + (done ? ' done' : '');
+    div.innerHTML = `<div class="cb">✓</div><div class="task-text">${t}</div>`;
+    div.onclick = function() {
+      state[stateKey][i] = !state[stateKey][i];
+      div.classList.toggle('done');
+      saveState();
+    };
+    el.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════
+
+function countDone(obj) { return Object.values(obj).filter(Boolean).length; }
+
+function pct(done, total) { return total ? Math.round(done/total*100) : 0; }
+
+function updateStats() {
+  const oopDone = countDone(state.oop);
+  const javaDone = countDone(state.java);
+  const inputDone = countDone(state.input);
+  const cpDone = countDone(state.cp);
+
+  const totalTopics = OOP_TOPICS.length + JAVA_TOPICS.length + INPUT_PATTERNS.length + CP_PATTERNS.length;
+  const totalDone = oopDone + javaDone + inputDone + cpDone;
+  const overall = pct(totalDone, totalTopics);
+
+  // badges
+  document.getElementById('oop-badge').textContent = `${oopDone}/${OOP_TOPICS.length}`;
+  document.getElementById('java-badge').textContent = `${javaDone}/${JAVA_TOPICS.length}`;
+  document.getElementById('input-badge').textContent = `${inputDone}/${INPUT_PATTERNS.length}`;
+  document.getElementById('cp-badge').textContent = `${cpDone}/${CP_PATTERNS.length}`;
+
+  // stat cards
+  document.getElementById('stat-overall').textContent = overall + '%';
+  document.getElementById('stat-overall-sub').textContent = `${totalDone} of ${totalTopics} topics`;
+  document.getElementById('stat-problems').textContent = state.easy + state.medium + state.hard;
+  document.getElementById('stat-problems-sub').textContent = `E:${state.easy} M:${state.medium} H:${state.hard}`;
+  document.getElementById('stat-topics').textContent = totalDone;
+  document.getElementById('stat-hours').textContent = state.hours + 'h';
+
+  // streak
+  const strk = calcStreak();
+  document.getElementById('stat-streak').textContent = strk.current;
+  if (document.getElementById('streak-current')) {
+    document.getElementById('streak-current').textContent = strk.current;
+    document.getElementById('streak-longest').textContent = strk.longest;
+    document.getElementById('streak-total').textContent = state.streak.length;
+  }
+
+  // overall prog bar
+  document.getElementById('prog-overall-fill').style.width = overall + '%';
+  document.getElementById('prog-overall-pct').textContent = overall + '%';
+
+  // mini progs
+  setMiniProg('mp-oop', oopDone, OOP_TOPICS.length);
+  setMiniProg('mp-java', javaDone, JAVA_TOPICS.length);
+  setMiniProg('mp-input', inputDone, INPUT_PATTERNS.length);
+  setMiniProg('mp-cp', cpDone, CP_PATTERNS.length);
+
+  // OOP page prog bar
+  if (document.getElementById('prog-oop-fill')) {
+    document.getElementById('prog-oop-fill').style.width = pct(oopDone, OOP_TOPICS.length) + '%';
+    document.getElementById('prog-oop-pct').textContent = `${oopDone}/${OOP_TOPICS.length}`;
+    document.getElementById('prog-java-fill').style.width = pct(javaDone, JAVA_TOPICS.length) + '%';
+    document.getElementById('prog-java-pct').textContent = `${javaDone}/${JAVA_TOPICS.length}`;
+    document.getElementById('prog-input-fill').style.width = pct(inputDone, INPUT_PATTERNS.length) + '%';
+    document.getElementById('prog-input-pct').textContent = `${inputDone}/${INPUT_PATTERNS.length}`;
+    document.getElementById('prog-cp-fill').style.width = pct(cpDone, CP_PATTERNS.length) + '%';
+    document.getElementById('prog-cp-pct').textContent = `${cpDone}/${CP_PATTERNS.length}`;
+  }
+
+  // problems page
+  if (document.getElementById('easy-count')) {
+    document.getElementById('easy-count').textContent = state.easy;
+    document.getElementById('medium-count').textContent = state.medium;
+    document.getElementById('hard-count').textContent = state.hard;
+  }
+
+  document.getElementById('total-hours-display').textContent = state.hours + 'h';
+}
+
+function setMiniProg(id, done, total) {
+  const p = pct(done, total);
+  const el = document.getElementById(id);
+  const pctEl = document.getElementById(id + '-pct');
+  if (el) el.style.width = p + '%';
+  if (pctEl) pctEl.textContent = p + '%';
+}
+
+// ═══════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════
+
+let timerSec = 6 * 3600, timerRunning = false, timerInterval;
+
+function timerToggle() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timer-start-btn').textContent = '▶ Resume';
+  } else {
+    timerRunning = true;
+    document.getElementById('timer-start-btn').textContent = '⏸ Pause';
+    timerInterval = setInterval(() => {
+      if (timerSec <= 0) { clearInterval(timerInterval); timerRunning = false; showToast('🎉 6 Hours Complete!'); return; }
+      timerSec--;
+      const h = String(Math.floor(timerSec/3600)).padStart(2,'0');
+      const m = String(Math.floor((timerSec%3600)/60)).padStart(2,'0');
+      const s = String(timerSec%60).padStart(2,'0');
+      document.getElementById('timer-display').textContent = `${h}:${m}:${s}`;
+    }, 1000);
+  }
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSec = 6 * 3600;
+  document.getElementById('timer-display').textContent = '06:00:00';
+  document.getElementById('timer-start-btn').textContent = '▶ Start';
+}
+
+// ═══════════════════════════════════════════════
+// TASK TOGGLE
+// ═══════════════════════════════════════════════
+
+function toggleTask(el) {
+  el.classList.toggle('done');
+}
+
+function toggleHour(n) {
+  const el = document.getElementById('hb-' + n);
+  el.classList.toggle('done');
+  state.hoursCompleted[n] = el.classList.contains('done');
+  saveState();
+}
+
+// ═══════════════════════════════════════════════
+// PROBLEMS
+// ═══════════════════════════════════════════════
+
+function addProb(type, delta) {
+  state[type] = Math.max(0, (state[type] || 0) + delta);
+  saveState();
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════
+// STREAK
+// ═══════════════════════════════════════════════
+
+function markToday() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (!state.streak.includes(today)) {
+    state.streak.push(today);
+    saveState();
+    buildStreakGrid();
+    updateStats();
+    showToast('✅ Today marked as studied!');
+  } else {
+    showToast('Already marked today!');
+  }
+}
+
+function calcStreak() {
+  const sorted = [...state.streak].sort();
+  if (sorted.length === 0) return { current: 0, longest: 0 };
+  let current = 0, longest = 0, run = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = new Date(sorted[i-1]), curr = new Date(sorted[i]);
+    const diff = (curr - prev) / 86400000;
+    if (diff === 1) { run++; }
+    else if (diff > 1) { longest = Math.max(longest, run); run = 1; }
+  }
+  longest = Math.max(longest, run);
+  const todayStr = new Date().toISOString().slice(0,10);
+  const ystrdayStr = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if (sorted[sorted.length-1] === todayStr || sorted[sorted.length-1] === ystrdayStr) {
+    current = run;
+  }
+  state.longestStreak = longest;
+  return { current, longest };
+}
+
+function buildStreakGrid() {
+  const el = document.getElementById('streak-grid');
+  if (!el) return;
+  el.innerHTML = '';
+  const today = new Date();
+  for (let i = 59; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0, 10);
+    const div = document.createElement('div');
+    div.className = 'streak-day' + (state.streak.includes(ds) ? ' studied' : '') + (i===0 ? ' today' : '');
+    div.setAttribute('data-date', ds);
+    div.title = ds;
+    el.appendChild(div);
+  }
+}
+
+function logHours() {
+  const v = parseFloat(document.getElementById('hours-input').value) || 0;
+  if (v > 0) {
+    state.hours = Math.round((state.hours + v) * 10) / 10;
+    saveState();
+    updateStats();
+    showToast(`+${v}h logged! Total: ${state.hours}h`);
+    document.getElementById('hours-input').value = '';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// NOTES & BOOKMARKS
+// ═══════════════════════════════════════════════
+
+function saveNotes() { state.notes = document.getElementById('main-notes').value; saveState(); }
+function saveQuickNote() { state.quickNote = document.getElementById('quick-note').value; saveState(); }
+
+function addBookmark() {
+  const v = document.getElementById('bookmark-input').value.trim();
+  if (!v) return;
+  state.bookmarks.push(v);
+  document.getElementById('bookmark-input').value = '';
+  saveState();
+  renderBookmarks();
+}
+
+function renderBookmarks() {
+  const el = document.getElementById('bookmark-list');
+  if (!el) return;
+  el.innerHTML = '';
+  state.bookmarks.forEach((b, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-family:var(--font-mono);font-size:13px;color:var(--text2)';
+    div.innerHTML = `<span style="flex:1">🔖 ${b}</span><button onclick="removeBookmark(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px">✕</button>`;
+    el.appendChild(div);
+  });
+}
+
+function removeBookmark(i) {
+  state.bookmarks.splice(i, 1);
+  saveState();
+  renderBookmarks();
+}
+
+// ═══════════════════════════════════════════════
+// VIVA
+// ═══════════════════════════════════════════════
+
+function buildViva() {
+  const el = document.getElementById('viva-list');
+  if (!el) return;
+  el.innerHTML = '';
+  VIVA_QA.forEach((qa, i) => {
+    const div = document.createElement('div');
+    div.className = 'viva-card';
+    div.innerHTML = `
+      <div class="viva-q">Q${i+1}. ${qa.q}</div>
+      <button class="viva-toggle" onclick="toggleViva(${i})">Show Answer</button>
+      <div class="viva-a" id="va-${i}">${qa.a}</div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function toggleViva(i) {
+  const el = document.getElementById('va-' + i);
+  const btn = el.previousElementSibling;
+  el.classList.toggle('show');
+  btn.textContent = el.classList.contains('show') ? 'Hide Answer' : 'Show Answer';
+}
+
+// ═══════════════════════════════════════════════
+// DAY SELECTOR
+// ═══════════════════════════════════════════════
+
+function buildDaySelector() {
+  const el = document.getElementById('day-selector');
+  if (!el) return;
+  el.innerHTML = '';
+  for (let d = 1; d <= 20; d++) {
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (d === state.currentDay ? ' active' : '');
+    btn.textContent = 'Day ' + d;
+    btn.onclick = () => {
+      state.currentDay = d;
+      saveState();
+      document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+    el.appendChild(btn);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'java_dashboard_backup.json';
+  a.click();
+  showToast('Data exported!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      state = JSON.parse(e.target.result);
+      saveState();
+      location.reload();
+    } catch(err) { showToast('Error importing file!'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (confirm('Reset ALL progress? This cannot be undone.')) {
+    localStorage.removeItem('java_dash_v2');
+    location.reload();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════
+// HEADER DATE
+// ═══════════════════════════════════════════════
+
+function setHeader() {
+  const d = new Date();
+  const opts = { weekday: 'long', month: 'short', day: 'numeric' };
+  document.getElementById('today-date').textContent = d.toLocaleDateString('en-IN', opts);
+  const h = d.getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting').textContent = g + ' 🚀';
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadState();
+
+  // header
+  setHeader();
+
+  // build grids
+  makeGrid('oop-grid', OOP_TOPICS, 'oop');
+  makeGrid('java-grid', JAVA_TOPICS, 'java');
+  makeGrid('input-grid', INPUT_PATTERNS, 'input');
+  makeGrid('cp-grid', CP_PATTERNS, 'cp');
+  makeGrid('string-grid', STRING_PROBLEMS, 'strings');
+  makeGrid('array-grid', ARRAY_PROBLEMS, 'arrays');
+  makeGrid('recursion-grid', RECURSION_PROBLEMS, 'recursion');
+  makeGrid('stackqueue-grid', STACKQUEUE_PROBLEMS, 'stackqueue');
+  makeGrid('tree-grid', TREE_PROBLEMS, 'trees');
+  makeGrid('graph-grid', GRAPH_PROBLEMS, 'graphs');
+
+  // problem checklists
+  makeProbList('prob-strings', STRING_PROBLEMS, 'probStrings');
+  makeProbList('prob-arrays', ARRAY_PROBLEMS, 'probArrays');
+  makeProbList('prob-recursion', RECURSION_PROBLEMS, 'probRecursion');
+  makeProbList('prob-stackqueue', STACKQUEUE_PROBLEMS, 'probStackQueue');
+  makeProbList('prob-trees', TREE_PROBLEMS, 'probTrees');
+  makeProbList('prob-graphs', GRAPH_PROBLEMS, 'probGraphs');
+
+  // viva
+  buildViva();
+
+  // day selector
+  buildDaySelector();
+
+  // streak grid
+  buildStreakGrid();
+
+  // notes
+  document.getElementById('main-notes').value = state.notes || '';
+  document.getElementById('quick-note').value = state.quickNote || '';
+  renderBookmarks();
+
+  // hour blocks
+  for (let i = 1; i <= 6; i++) {
+    if (state.hoursCompleted[i]) {
+      document.getElementById('hb-' + i).classList.add('done');
+    }
+  }
+
+  // stats
+  updateStats();
+
+  // day number in stat card
+  document.getElementById('stat-day').textContent = state.currentDay;
+});
+</script>
+</body>
+</html>
